@@ -1,6 +1,6 @@
-_G.iOSr = {
+_G.iOSs = {
     [ "dir"] = shell.dir(),
-    [ "build"] = "2016.7.29.2.07",
+    [ "build"] = "2016.7.29.11.30",
     [ "buildURL"] = "http://pastebin.com/raw/d9u0SceS",
     [ "directoryStructure" ] = {
         [ "base" ] = "/iOS/switch",
@@ -16,9 +16,9 @@ function log(...)
 
     local tmpLog
 
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log") then
+    if fs.exists(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/log") then
 
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "r")
+        local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/log", "r")
         tmpLog = textutils.unserialize(t.readAll())
         t.close()
 
@@ -47,7 +47,7 @@ function log(...)
 
             table.insert(tmpLog, os.clock() .. " >> " .. pString)
 
-            local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "w")
+            local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/log", "w")
             t.write(textutils.serialize(tmpLog))
             t.close()
 
@@ -85,12 +85,12 @@ function log(...)
 end
 
 function getLatestBuildNumber()
-    if http.checkURL(_G.iOSr["buildURL"]) then
+    if http.checkURL(_G.iOSs["buildURL"]) then
         log("DEBUG", "checkURL true")
         local headers = {
-            [ "User-Agent" ] = "iOS/" .. _G.iOSr["build"] .. " (" .. os.version() .. ")"
+            [ "User-Agent" ] = "iOS/" .. _G.iOSs["build"] .. " (" .. os.version() .. ")"
         }
-        local getVar = http.get(_G.iOSr["buildURL"], headers)
+        local getVar = http.get(_G.iOSs["buildURL"], headers)
         local currentBuild = textutils.unserialize(getVar.readAll())["switch"]
         log("DEBUG", "Latest build: " .. currentBuild)
         getVar.close()
@@ -105,7 +105,7 @@ function openModems()
     local sides = rs.getSides()
 
     local vlans
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "r")
+    local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/vlan", "r")
     vlans = textutils.unserialize(t.readAll())
     t.close()
 
@@ -113,8 +113,8 @@ function openModems()
         if peripheral.getType(sides[i]) == "modem" then
 			local tmpWrap = peripheral.wrap(sides[i])
             if tmpWrap.isWireless() == false then
-				_G.iOSr["modems"][sides[i]] = tmpWrap
-                _G.iOSr["modems"][sides[i]].closeAll()
+				_G.iOSs["modems"][sides[i]] = tmpWrap
+                _G.iOSs["modems"][sides[i]].closeAll()
 
                 if vlans[sides[i]] == nil then
 
@@ -124,7 +124,7 @@ function openModems()
 
                     log("INFO", "Opening " .. sides[i] .. " on VLAN 1")
 
-                    _G.iOSr["modems"][sides[i]].open(1)
+                    _G.iOSs["modems"][sides[i]].open(1)
 
                 else
 
@@ -132,7 +132,7 @@ function openModems()
 
                         log("INFO", "Opening " .. sides[i] .. " on VLAN " .. vlans[sides[i]][vl])
 
-                        _G.iOSr["modems"][sides[i]].open(vlans[sides[i]][vl])
+                        _G.iOSs["modems"][sides[i]].open(vlans[sides[i]][vl])
                     end
 
                 end
@@ -142,35 +142,35 @@ function openModems()
         end
     end
 
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "w")
+    local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/vlan", "w")
     t.write(textutils.serialize(vlans))
     t.close()
 
 end
 
 function checkOSStructure()
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log") == false then
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "w")
+    if fs.exists(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/log") == false then
+        local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/log", "w")
         t.write("{}")
         t.close()
         log("ERR", "Log file does not exist")
     end
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"]) == false then
+    if fs.exists(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"]) == false then
         log("ERR", "Base directory does not exist")
         log("ERR", "If this is your first time running this, then it is expected.")
-        fs.makeDir(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"])
+        fs.makeDir(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"])
         log("DEBUG", "Created base directory")
     end
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan") == false then
+    if fs.exists(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/vlan") == false then
         log("ERR", "Vlan file does not exist")
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "w")
+        local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/vlan", "w")
         t.write("{}")
         t.close()
     end
 
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt") == false then
+    if fs.exists(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/ilt") == false then
         log("ERR", "ILT file does not exist")
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "w")
+        local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/ilt", "w")
         t.write("{}")
         t.close()
     end
@@ -183,12 +183,12 @@ function startup()
     log("DEBUG", "Opening modems")
     openModems()
     log("DEBUG", "Checking for updates..")
-    log("DEBUG", "Current build: " .. _G.iOSr["build"])
+    log("DEBUG", "Current build: " .. _G.iOSs["build"])
     local latest = getLatestBuildNumber()
-    if (_G.iOSr["build"] == latest) then
+    if (_G.iOSs["build"] == latest) then
         log("DEBUG", "You are on the latest software release")
     else
-        if (_G.iOSr["build"] < latest) then
+        if (_G.iOSs["build"] < latest) then
             log("ERR", "You are running an out-of-date build")
         else
             log("INFO", "You are on the development branch")
@@ -199,7 +199,7 @@ function startup()
         [[
 ===================================================
 
-	     InZernet Switch build ]] .. _G.iOSr["build"] ..
+	     InZernet Switch build ]] .. _G.iOSs["build"] ..
         [[
 
 
@@ -274,7 +274,7 @@ function addToILT(IP, side)
 
     local ilt
 
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "r")
+    local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/ilt", "r")
     ilt = textutils.unserialize(t.readAll())
     t.close()
 
@@ -284,7 +284,7 @@ function addToILT(IP, side)
 
     ilt[IP] = side
 
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "w")
+    local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/ilt", "w")
     t.write(textutils.serialize(ilt))
     t.close()
 
@@ -294,7 +294,7 @@ function inILT(IP)
 
     local ilt
 
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "r")
+    local t = fs.open(_G.iOSs["dir"] .. _G.iOSs["directoryStructure"]["base"] .. "/ilt", "r")
     ilt = textutils.unserialize(t.readAll())
     t.close()
 
@@ -320,11 +320,11 @@ function packetHandler(pkt, side, vlan)
                 log("DEBUG", "Packet coming from side in ILT")
 			else
 				log("DEBUG", "Packet in ILT -- redirecting")
-				_G.iOSr["modems"][side].transmit(vlan, vlan, pkt)
+				_G.iOSs["modems"][side].transmit(vlan, vlan, pkt)
             end
         else
             log("DEBUG", "Unknown route -- broadcasting")
-			for k, v in pairs(_G.iOSr["modems"]) do
+			for k, v in pairs(_G.iOSs["modems"]) do
 				if k ~= side then
 					v.transmit(vlan, vlan, pkt)
 					log("DEBUG", "Broadcasted on " .. k)
