@@ -42,7 +42,7 @@ function log(...)
 				end
 			end
 		
-			table.insert(tmpLog, os.time() .. " >> " .. pString)
+			table.insert(tmpLog, os.clock() .. " >> " .. pString)
 			
 			local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "w")
 			t.write(textutils.serialize(tmpLog))
@@ -129,7 +129,7 @@ function openModems()
 	  
 		for vl=1, #vlans[sides[i]] do
 		
-			log("INFO", "Opening " .. sides[i] .. " on VLAN " .. vl)
+			log("INFO", "Opening " .. sides[i] .. " on VLAN " .. vlans[sides[i]][vl])
 		
 			peripheralTable[2].open(vlans[sides[i]][vl])
 		end
@@ -144,7 +144,6 @@ function openModems()
   t.close()
 
 end
-
 
 function checkOSStructure()
 	if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"]) == false then
@@ -162,6 +161,13 @@ function checkOSStructure()
 	if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan") == false then
 		log("ERR", "Vlan file does not exist")
 		local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "w")
+		t.write("{}")
+		t.close()
+	end
+	
+	if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt") == false then
+		log("ERR", "ILT file does not exist")
+		local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "w")
 		t.write("{}")
 		t.close()
 	end
@@ -250,6 +256,22 @@ Would you like to update? [Y/n] ]]
 				print ("You are on the development branch")
 			end
 		end
+	end,
+	
+	["log"] = function(arg)
+	
+		if (arg[1] == "clear") then
+			
+			local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "w")
+			t.write("{}")
+			t.close()
+			
+			log("INFO", "Log file cleared")
+			
+		else
+			log("ERR", "Usage: log <clear>")
+		end
+	
 	end,
 	
 	["vlan"] = function(arg)
@@ -422,14 +444,38 @@ function packetCheck(packet)
 	end
 end
 
-function packetHandler(pkt)
+function addToILT(IP, side)
+
+	local ilt
+
+	local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "r")
+	ilt = textutils.unserialize(t.readAll())
+	t.close()
+	
+	if ilt == nil then
+		ilt = {}
+	end
+	
+	ilt[IP] = side
+	
+	local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "w")
+	t.write(textutils.serialize(ilt))
+	t.close()
+
+end
+
+function inILT(IP)
+
+
+
+end
+
+function packetHandler(pkt, side)
 
 	if packetCheck(pkt) == true then
 	
-		print("Packet good")
+		addToILT(pkt[4], side)
 	
-	else
-		print("packet not good")
 	end
 	
 end
@@ -437,7 +483,7 @@ end
 function main()
 	while continue do
 		local event, side, freq, rFreq, msg, dis = os.pullEvent("modem_message")
-		packetHandler(msg)
+		packetHandler(msg, side)
 	end
 end
 
