@@ -17,9 +17,9 @@ function saveFile(path)
 end
 
 function save()
-    for _,v in pairs(_G.cache) do
-        if type(v) == "string" then
-            saveFile(v)
+    for k,_ in pairs(_G.cache) do
+        if type(k) == "string" then
+            saveFile(k)
         end
     end
 end
