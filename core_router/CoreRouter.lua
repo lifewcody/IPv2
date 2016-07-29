@@ -8,7 +8,7 @@ _G.iOSr = {
     [ "modems" ] = {}
 }
 
-os.loadApi("modules/cache")
+os.loadAPI("modules/cache")
 
 local continue = true
 local arguments = {...}
@@ -133,6 +133,16 @@ function checkOSStructure()
     end
 end
 
+function saveFiles()
+    while continue do
+        local timer = os.startTimer(5)
+        repeat
+            local e,t = os.pullEvent("timer")
+        until t == timer
+        cache.save()
+    end
+end
+
 function startup()
     log("DEBUG", "Checking OS Folder Structure")
     checkOSStructure()
@@ -162,7 +172,7 @@ function startup()
 
 ===================================================
 	]])
-    parallel.waitForAny(CLI, main)
+    parallel.waitForAny(CLI, main, saveFiles)
 end
 
 local commands = {
