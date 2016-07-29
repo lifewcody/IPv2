@@ -1,3 +1,13 @@
+--[[
+cache.load(path) - Loads a file into the cache
+cache.saveFile(path) - Saves a specific file from the cache to the drive
+cache.save() - Saves all cached files to the drive
+cache.refresh() - Replaces cached files with version on drive, ignores cached files not on drive
+cache.write(path, data) - Writes data to path in cache, overwrites existing data
+cache.append(path, data) - Appends data to path in cache, includes existing data
+cache.read(path) - Returns data in path. If file not in cache, but on drive, then it is loaded into the cache and returned. Returns nil if file is not on cache or drive
+--]]
+
 function load(path)
     if fs.exists(path) then
         local file = fs.open(path, "r")
