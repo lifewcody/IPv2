@@ -5,6 +5,8 @@ Official Forum: http://www.computercraft.info/forums2/index.php?/topic/27268-ipv
 
 # Structure
 
+	/BETA/ - Files ready to be beta tested go here
+
 	/core_router/ - Everything related to the core router goes here
 
 		cr - Core router file
@@ -17,3 +19,6 @@ Official Forum: http://www.computercraft.info/forums2/index.php?/topic/27268-ipv
 	
 	/buildInfo - Generates the build info for the pastebin updater
 
+# Build Number
+
+<Year>.<Month>.<Date>.<24Hour>.<Minute> (Excludes leading 0's and time is Eastern Time)
