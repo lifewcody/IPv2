@@ -28,7 +28,9 @@ function refresh()
     end
 
     for _,v in pairs(_G.cache) do
-        load(v)
+        if type(v) == "string" then
+            load(v)
+        end
     end
 end
 
@@ -38,7 +40,7 @@ end
 
 function append(path, data)
     if _G.cache[path] ~= nil then
-        _G.cache[path] = _G.cache[path] + data
+        _G.cache[path] = _G.cache[path] .. data
     else
         write(path, data)
     end
