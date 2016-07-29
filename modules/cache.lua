@@ -10,6 +10,7 @@ cache.read(path) - Returns data in path. If file not in cache, but on drive, the
 
 function load(path)
     if fs.exists(path) then
+        _G.ucache[path] = false
         local file = fs.open(path, "r")
         _G.icache[path] = fs.readAll()
         file.close()
@@ -21,6 +22,7 @@ function saveFile(path)
         return
     end
 
+    _G.ucache[path] = false
     local file = fs.open(path, "w")
     file.write(_G.icache[path])
     file.close()
@@ -28,7 +30,7 @@ end
 
 function save()
     for k,_ in pairs(_G.icache) do
-        if type(k) == "string" then
+        if type(k) == "string" and _G.ucache[k] == true then
             saveFile(k)
         end
     end
@@ -37,6 +39,10 @@ end
 function refresh()
     if _G.icache == nil then
         _G.icache = {}
+    end
+
+    if _G.ucache == nil then
+        _G.ucache = {}
     end
 
     for _,v in pairs(_G.icache) do
@@ -48,11 +54,13 @@ end
 
 function write(path, data)
     _G.icache[path] = data
+    _G.ucache[path] = true
 end
 
 function append(path, data)
     if _G.icache[path] ~= nil then
         _G.icache[path] = _G.icache[path] .. data
+        _G.ucache[path] = true
     else
         write(path, data)
     end
@@ -65,3 +73,4 @@ function read(path)
 
     return _G.icache[path]
 end
+
