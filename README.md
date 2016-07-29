@@ -21,4 +21,5 @@ Official Forum: http://www.computercraft.info/forums2/index.php?/topic/27268-ipv
 
 # Build Number
 
-<Year>.<Month>.<Date>.<24Hour>.<Minute> (Excludes leading 0's and time is Eastern Time)
+	<Year>.<Month>.<Date>.<24Hour>.<Minute>
+(Excludes leading 0's and time is Eastern Time)
