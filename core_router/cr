@@ -1,6 +1,6 @@
 _G.iOSr = {
     [ "dir"] = shell.dir(),
-    [ "build"] = "2016.7.29.2.07",
+    [ "build"] = "2016.7.29.2.7",
     [ "buildURL"] = "http://pastebin.com/raw/d9u0SceS",
     [ "directoryStructure" ] = {
         [ "base" ] = "/iOS/router",
@@ -14,22 +14,11 @@ local continue = true
 
 function log(...)
 
-    local tmpLog
-
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log") then
-
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "r")
-        tmpLog = textutils.unserialize(t.readAll())
-        t.close()
-
-    else
-
-        tmpLog = {}
-
-    end
+	if cache["log"] == nil then
+		cache["log"] = {}
+	end
 
     local arguments = {...}
-
 
     if arguments[1] == "ERR" or arguments[1] == "DEBUG" or arguments[1] == "INFO" then
         if #arguments > 1 then
@@ -45,11 +34,7 @@ function log(...)
                 end
             end
 
-            table.insert(tmpLog, os.clock() .. " >> " .. pString)
-
-            local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "w")
-            t.write(textutils.serialize(tmpLog))
-            t.close()
+            table.insert(cache["log"], os.clock() .. " >> " .. pString)
 
             if arguments[1] == "ERR" then
 
@@ -104,10 +89,9 @@ end
 function openModems()
     local sides = rs.getSides()
 
-    local vlans
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "r")
-    vlans = textutils.unserialize(t.readAll())
-    t.close()
+    if cache["vlans"] == nil then
+		cache["vlans"] = {}
+	end
 
     for i=1, #sides do
         if peripheral.getType(sides[i]) == "modem" then
@@ -116,11 +100,11 @@ function openModems()
 				_G.iOSr["modems"][sides[i]] = tmpWrap
                 _G.iOSr["modems"][sides[i]].closeAll()
 
-                if vlans[sides[i]] == nil then
+                if cache["vlans"][sides[i]] == nil then
 
                     local vtbl = {1}
 
-                    vlans[sides[i]] = vtbl
+                    cache["vlans"][sides[i]] = vtbl
 
                     log("INFO", "Opening " .. sides[i] .. " on VLAN 1")
 
@@ -128,11 +112,11 @@ function openModems()
 
                 else
 
-                    for vl=1, #vlans[sides[i]] do
+                    for vl=1, #cache["vlans"][sides[i]] do
 
-                        log("INFO", "Opening " .. sides[i] .. " on VLAN " .. vlans[sides[i]][vl])
+                        log("INFO", "Opening " .. sides[i] .. " on VLAN " .. cache["vlans"][sides[i]][vl])
 
-                        _G.iOSr["modems"][sides[i]].open(vlans[sides[i]][vl])
+                        _G.iOSr["modems"][sides[i]].open(cache["vlans"][sides[i]][vl])
                     end
 
                 end
@@ -142,37 +126,29 @@ function openModems()
         end
     end
 
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "w")
-    t.write(textutils.serialize(vlans))
-    t.close()
-
 end
 
 function checkOSStructure()
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log") == false then
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "w")
-        t.write("{}")
-        t.close()
-        log("ERR", "Log file does not exist")
-    end
     if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"]) == false then
         log("ERR", "Base directory does not exist")
         log("ERR", "If this is your first time running this, then it is expected.")
         fs.makeDir(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"])
         log("DEBUG", "Created base directory")
     end
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan") == false then
-        log("ERR", "Vlan file does not exist")
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "w")
+    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/cache") == false then
+        log("ERR", "Cache file does not exist")
+        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/cache", "w")
         t.write("{}")
+		cache["log"] = {}
+		cache["ilt"] = {}
+		cache["vlans"] = {}
         t.close()
-    end
-
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt") == false then
-        log("ERR", "ILT file does not exist")
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "w")
-        t.write("{}")
-        t.close()
+	else
+	
+        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/cache", "r")
+        cache = textutils.unserialize(t.readAll())
+		t.close()
+	
     end
 end
 
@@ -205,7 +181,7 @@ function startup()
 
 ===================================================
 	]])
-    parallel.waitForAny(CLI, main)
+    parallel.waitForAny(CLI, main, writeCacheLoop)
 end
 
 local commands = {
@@ -215,6 +191,7 @@ local commands = {
         end,
 
         ["exit"] = function()
+			writeCache()
             continue = false
         end,
 
@@ -233,6 +210,16 @@ local commands = {
                 log("INFO", "Done")
             else
                 log("ERR", "Invalid argument")
+            end
+        end,
+		
+		["cache"] = function(arg)
+            if string.lower(arg[1]) == "write" then
+                log("INFO", "Writing cache")
+                writeCache()
+                log("INFO", "Done")
+            else
+                log("ERR", "Usage cache <write>")
             end
         end,
 
@@ -298,10 +285,7 @@ Would you like to update? [Y/n] ]]
                             if rs.getSides()[i] == string.lower(arg[2]) then
                                 isValidSide = true
 
-                                local vlans
-                                local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "r")
-                                vlans = textutils.unserialize(t.readAll())
-                                t.close()
+                                local vlans = cache["vlans"]
 
                                 if vlans[arg[2]] == nil then
                                     vlans[arg[2]] = {
@@ -331,10 +315,6 @@ Would you like to update? [Y/n] ]]
 
 
                                 log("INFO", "Added VLAN " .. arg[2] .. " to side " .. arg[3])
-
-                                local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/vlan", "w")
-                                t.write(textutils.serialize(vlans))
-                                t.close()
 
                             end
                         end
@@ -447,11 +427,7 @@ end
 
 function addToILT(IP, side)
 
-    local ilt
-
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "r")
-    ilt = textutils.unserialize(t.readAll())
-    t.close()
+    local ilt = cache["ilt"]
 
     if ilt == nil then
         ilt = {}
@@ -459,28 +435,22 @@ function addToILT(IP, side)
 
     ilt[IP] = side
 
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "w")
-    t.write(textutils.serialize(ilt))
-    t.close()
-
 end
 
 function inILT(IP)
 
-    local ilt
-
-    local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/ilt", "r")
-    ilt = textutils.unserialize(t.readAll())
-    t.close()
+    if cache["ilt"] == nil then
+		cache["ilt"] = {}
+	end
 
     if IP == nil then
         return false
     end
 
-    if ilt[IP] == nil then
+    if cache["ilt"][IP] == nil then
         return false
     else
-        return ilt[IP]
+        return cache["ilt"][IP]
     end
 
 end
@@ -516,6 +486,21 @@ function main()
         local event, side, vlan, rFreq, pkt, dis = os.pullEvent("modem_message")
         packetHandler(pkt, side, vlan)
     end
+end
+
+function writeCache()
+	local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/cache", "w")
+	t.write(textutils.serialize(cache))
+	t.close()
+end
+
+function writeCacheLoop()
+
+	while continue do
+		writeCache()
+		sleep(30)
+	end
+
 end
 
 startup()
