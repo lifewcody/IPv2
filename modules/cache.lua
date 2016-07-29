@@ -18,7 +18,9 @@ end
 
 function save()
     for _,v in pairs(_G.cache) do
-        saveFile(v)
+        if type(v) == "string" then
+            saveFile(v)
+        end
     end
 end
 
