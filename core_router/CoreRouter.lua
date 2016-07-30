@@ -11,11 +11,11 @@ _G.iOSr = {
 os.loadAPI("modules/cache")
 
 local continue = true
-local log = nil
+local ilog = nil
 
 function log(...)
-    if log == nil then
-        log = textutils.unserialize(cache.read(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log"))
+    if ilog == nil then
+        ilog = textutils.unserialize(cache.read(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log"))
     end
 
     local arguments = {...}
@@ -33,8 +33,8 @@ function log(...)
                 end
             end
 
-            table.insert(log, os.clock() .. " >> " .. pString)
-            cache.write(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", textutils.serialize(log))
+            table.insert(ilog, os.clock() .. " >> " .. pString)
+            cache.write(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", textutils.serialize(ilog))
 
             if arguments[1] == "ERR" then
                 term.setTextColor(colors.red)
