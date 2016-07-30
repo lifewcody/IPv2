@@ -13,7 +13,6 @@ function setType(t)
 end
 
 function checkForUpdates()
-
 	if pastebinURL == nil or cVersion == nil or pType == nil then
 		return false
 	end
@@ -26,7 +25,6 @@ function checkForUpdates()
     else
 		return false
     end
-
 end
 
 function needsUpdates()
@@ -35,4 +33,8 @@ function needsUpdates()
 	else
 		return true
 	end
+end
+
+function getLatestVersion()
+	return pVersion
 end

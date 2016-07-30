@@ -69,12 +69,17 @@ local logLevels = {
 }
 
 function log(...)
-	testCache()
-	
 	local args = {...}
-	
+
+	if not _G.ilog then
+		_G.ilog = textutils.unserialize(cache.read(_G.workingDir .. "/log"))
+		if not _G.ilog then
+			_G.ilog = {}
+		end
+	end
+
 	if #args >= 1 then
-		table.insert(_G["cache"]["log"], os.clock() .. " >> [" .. string.upper(args[1]) .. "] [" .. args[2] .. "]")
+		table.insert(_G.ilog, os.clock() .. " >> [" .. string.upper(args[1]) .. "] [" .. args[2] .. "]")
 		if logEvents[string.upper(args[1])] ~= nil then
 			local isInLogLevels = false
 			for i=1, #logLevels[logLevel] do
@@ -87,25 +92,22 @@ function log(...)
 				print(args[2])
 			end
 		end
-		
 	else
 		return false
 	end
 
+	cache.write(_G.workingDir .. "/log", textutils.serialize(_G.ilog))
 end
 
-function testCache()
-	if _G["cache"]["log"] == nil then
-		_G["cache"]["log"] = {}
-	end
+function clearLog()
+	_G.ilog = {}
+	cache.write(_G.workingDir .. "/log", "{}")
 end
 
 function setLogLevel(level)
-
 	if tonumber(level) then
 		logLevel = tonumber(level)
 	else
 		return false
 	end
-
 end
