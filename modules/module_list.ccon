@@ -1,0 +1,22 @@
+{
+    {
+        "Cache",
+        "cache.lua",
+        "cache",
+    },
+    {
+        "Log",
+        "log.lua",
+        "log",
+    },
+    {
+        "Module Manager",
+        "module_manager.lua",
+        "module_manager",
+    },
+    {
+        "Update",
+        "update.lua",
+        "update",
+    },
+}

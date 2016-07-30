@@ -1,0 +1,12 @@
+{
+    {
+        "Core Router",
+        "core_router/CoreRouter.lua",
+        "core_router",
+    },
+    {
+        "Switch",
+        "switch/switch.lua",
+        "switch",
+    },
+}
