@@ -11,13 +11,14 @@ _G.iOSr = {
 os.loadAPI("modules/cache")
 
 local continue = true
-local arguments = {...}
 local log = nil
 
 function log(...)
     if log == nil then
         log = textutils.unserialize(cache.read(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log"))
     end
+
+    local arguments = {...}
 
     if arguments[1] == "ERR" or arguments[1] == "DEBUG" or arguments[1] == "INFO" then
         if #arguments > 1 then
