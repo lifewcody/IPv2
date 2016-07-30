@@ -144,6 +144,7 @@ function saveFiles()
 end
 
 function startup()
+    cache.refresh()
     log("DEBUG", "Checking OS Folder Structure")
     checkOSStructure()
     log("INFO", "Done")
