@@ -30,3 +30,5 @@ function main()
 
     print("You selected " .. program .. " which is the " .. programs[program][1])
 end
+
+main()
