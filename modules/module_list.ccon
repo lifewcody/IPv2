@@ -19,4 +19,9 @@
         "modules/update.lua",
         "update",
     },
+    {
+        "Modem",
+        "modules/modem.lua",
+        "modem",
+    },
 }
