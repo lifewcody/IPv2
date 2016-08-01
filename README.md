@@ -5,8 +5,6 @@ Official Forum: http://www.computercraft.info/forums2/index.php?/topic/27268-ipv
 
 # Structure
 
-	/builds/ - Files ready to be tested go here
-
 	/core_router/ - Everything related to the core router goes here
 
 		cr - Core router file
@@ -16,6 +14,9 @@ Official Forum: http://www.computercraft.info/forums2/index.php?/topic/27268-ipv
 	
 		cache.lua - Cache module
 		log.lua - Log module
+		modem.lua - Modem module
+		module_list.ccon - Module list
+		module_manager.lua - Module Manager
 		update.lua - Update module
 	
 	/test/ - Testing files go here
