@@ -2,36 +2,36 @@
     {
         "Cache",
         "modules/cache.lua",
-        "cache",
+        "cache.lua",
     },
     {
         "Log",
         "modules/log.lua",
-        "log",
+        "log.lua",
     },
     {
         "Module Manager",
         "modules/module_manager.lua",
-        "module_manager",
+        "module_manager.lua",
     },
     {
         "Update",
         "modules/update.lua",
-        "update",
+        "update.lua",
     },
     {
         "Modem",
         "modules/modem.lua",
-        "modem",
+        "modem.lua",
     },
     {
         "Packet",
         "modules/packet.lua",
-        "packet",
+        "packet.lua",
     },
     {
         "ILT",
         "modules/ilt.lua",
-        "ilt",
+        "ilt.lua",
     }
 }

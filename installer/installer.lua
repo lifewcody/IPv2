@@ -33,7 +33,7 @@ end
 
 function installProgram()
     local i = programs[program][3]
-    local j = i .. "/" .. i
+    local j = i .. "/" .. i .. ".lua"
     downloadFile(programs[program][2], j)
     print("[*] Downloaded " .. j)
 end
