@@ -72,10 +72,9 @@ function log(...)
 	local args = {...}
 
 	if not _G.ilog then
-		_G.ilog = textutils.unserialize(cache.readCache("log"))
-		if not _G.ilog then
-			_G.ilog = {}
-		end
+		_G.ilog = {}
+	else
+		_G.ilog = textutils.unserialize(_G["cache.lua"].readCache("log"))
 	end
 
 	if #args >= 1 then
@@ -96,12 +95,12 @@ function log(...)
 		return false
 	end
 
-	cache.writeCache("log", textutils.serialize(_G.ilog))
+	_G["cache.lua"].writeCache("log", textutils.serialize(_G.ilog))
 end
 
 function clearLog()
 	_G.ilog = {}
-	cache.write("log", "{}")
+	_G["cache.lua"].write("log", "{}")
 end
 
 function setLogLevel(level)
