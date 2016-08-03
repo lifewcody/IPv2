@@ -109,3 +109,39 @@ function setData(packet, data)
     packet[packet_info[packet[1]].format.data] = data
     return packet
 end
+
+-- UDP Functions
+function getUDPSrcPort(data)
+    return data[1]
+end
+
+function getUDPDstPort(data)
+    return data[2]
+end
+
+function getUDPData(data)
+    return data[3]
+end
+
+function buildUDP(srcPort, dstPort, data)
+    return {
+        [1] = srcPort,
+        [2] = dstPort,
+        [3] = data,
+    }
+end
+
+function setUDPSrcPort(data, srcPort)
+    data[1] = srcPort
+    return data
+end
+
+function setUDPDstPort(data, dstPort)
+    data[2] = dstPort
+    return data
+end
+
+function setUDPData(data, udpData)
+    data[3] = udpData
+    return data
+end
