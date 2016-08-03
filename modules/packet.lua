@@ -43,6 +43,10 @@ local function getProtocolNum(version, protocol)
 end
 
 -- Packet Reading Functions
+function validatePacket(packet)
+    return packet[1] ~= nil and packet_info[packet[1]] ~= nil
+end
+
 function getVersion(packet)
     return packet[1]
 end

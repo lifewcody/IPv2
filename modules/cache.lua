@@ -52,7 +52,7 @@ function readCache(path)
     check()
 
     if _G.icache[path] == nil then
-        load(path)
+        loadCache(path)
     end
 
     return _G.icache[path]

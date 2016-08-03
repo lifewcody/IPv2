@@ -72,9 +72,12 @@ function log(...)
 	local args = {...}
 
 	if not _G.ilog then
-		_G.ilog = {}
-	else
-		_G.ilog = textutils.unserialize(_G["cache.lua"].readCache("log"))
+		local n = _G["cache.lua"].readCache("log")
+		if n then
+			_G.ilog = textutils.unserialize(n)
+		else
+			_G.ilog = {}
+		end
 	end
 
 	if #args >= 1 then

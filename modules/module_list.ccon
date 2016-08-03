@@ -28,5 +28,10 @@
         "Packet",
         "modules/packet.lua",
         "packet",
+    },
+    {
+        "ILT",
+        "modules/ilt.lua",
+        "ilt",
     }
 }
