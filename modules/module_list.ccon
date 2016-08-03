@@ -24,4 +24,9 @@
         "modules/modem.lua",
         "modem",
     },
+    {
+        "Packet",
+        "modules/packet.lua",
+        "packet",
+    }
 }
