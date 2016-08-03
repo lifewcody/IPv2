@@ -11,7 +11,8 @@ while true do
     2,
     17,
     255,
-    "0.0",
+    --math.random(100) .. "." .. math.random(100),
+    "30.4",
     "0.1",
     dataPkt,
   
