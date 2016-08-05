@@ -26,7 +26,7 @@ local function loadCache(path)
     if fs.exists(ipath) then
         _G.ucache[path] = false
         local file = fs.open(ipath, "r")
-        _G.icache[path] = fs.readAll()
+        _G.icache[path] = file.readAll()
         file.close()
     end
 end
