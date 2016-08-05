@@ -1,5 +1,3 @@
-local WiFi = {}
-
 local function generatePassword(length)
 	local code
 	local validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -16,27 +14,51 @@ end
 
 function openModems()
 
+	_G["modems"] = _G["cache.lua"].readCache("modems")
+	
+	if _G["modems"] == nil then
+		_G["modems"] = {}
+	end
+	
 	for a=1, #rs.getSides() do
 	
 		if peripheral.getType(rs.getSides()[a]) == "modem" then
-		
+			if not _G["modems"][rs.getSides()[a]] then
+				_G["modems"][rs.getSides()[a]] = {
+					["TX"] = {},
+					["RX"] = {}
+				}
+			end
 			if peripheral.call(rs.getSides()[a], "isWireless") then
-				_G["log.lua"].log("DEBUG", "Found wirless modem on " .. rs.getSides()[a])
-				_G["log.lua"].log("DEBUG", "Selecting random channel for WiFi")
-				WiFi["channel"] = math.random(150, 175)
-				_G["log.lua"].log("DEBUG", "Selected channel " .. WiFi["channel"])
-				_G["log.lua"].log("DEBUG", "Opening WiFi")
-				WiFi["SSID"] = "CC" .. os.getComputerID() .. string.upper(string.sub(rs.getSides()[a],1,1))
-				WiFi["password"] = generatePassword(6)
-				for k,v in pairs(WiFi) do
-					print(k .. " > " .. v)
+				if _G["modems"][rs.getSides()[a]]["WiFi"] == nil then
+					_G["modems"][rs.getSides()[a]]["WiFi"] = {
+						["channel"] = math.random(150, 175),
+						["SSID"] = "CC" .. os.getComputerID() .. string.upper(string.sub(rs.getSides()[a],1,1)),
+						["password"] = generatePassword(6)
+					}
 				end
+				_G["log.lua"].log("NOTICE", string.upper(rs.getSides()[a]) .. " WiFi Information")
+				for k,v in pairs(_G["modems"][rs.getSides()[a]]["WiFi"]) do
+					_G["log.lua"].log("INFO", k .. " > " .. v)
+				end
+				_G["log.lua"].log("DEBUG", "---------------------------------------------------")
+				peripheral.call(rs.getSides()[a], "open", _G["modems"][rs.getSides()[a]]["WiFi"]["channel"])
 			else
-				_G["log.lua"].log("DEBUG", "Found wired modem on " .. rs.getSides()[a])
+				if _G["modems"][rs.getSides()[a]]["VLAN"] == nil then
+					_G["modems"][rs.getSides()[a]]["VLAN"] = {
+						1,
+					}
+				end
+				for k,v in pairs(_G["modems"][rs.getSides()[a]]["VLAN"]) do
+					peripheral.call(rs.getSides()[a], "open", _G["modems"][rs.getSides()[a]]["VLAN"][v])
+					_G["log.lua"].log("DEBUG", "Opening VLAN " .. v .. " on " .. rs.getSides()[a])
+				end
 			end
 		end
 	
 	end
+	
+	_G["cache.lua"].writeCache("modems", _G["modems"])
 	
 end
 
