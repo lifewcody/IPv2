@@ -11,7 +11,7 @@ if os.loadAPI(shell.dir() .. "/../modules/log.lua") then
 end
 
 if os.loadAPI(shell.dir() .. "/../modules/update.lua") then
-	print("log.lua loaded")
+	print("update.lua loaded")
 end
 
 if os.loadAPI(shell.dir() .. "/../modules/modem.lua") then
@@ -29,7 +29,7 @@ _G["update.lua"].setVersion("2016.7.29.02.07")
 _G["update.lua"].checkForUpdates()
 print("Needs updates? " .. tostring(_G["update.lua"].needsUpdates()))
 ]]--
+_G["log.lua"].setLogLevel(0)
 _G["cache.lua"].setPath(shell.dir() .. "/")
 _G["modem.lua"].openModems()
 _G["cache.lua"].saveCache()
-
