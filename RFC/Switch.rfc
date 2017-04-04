@@ -1,0 +1,14 @@
+##############################
+#  InZernet Protocol Switch  #
+##############################
+
+1700.1 {Definitions}
+	IP = InZernet Protocol
+	
+1700.2 {Functions}
+	1700.3 {VLAN}
+		1700.3.1
+			Each physical interface by default is trunked and listening on VLAN 1
+		1700.3.2
+			For every VLAN on the trunked interface between 1-128, open channel and listen.
+		1700.3.3
