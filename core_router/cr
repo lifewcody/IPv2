@@ -1,176 +1,86 @@
-_G.iOSr = {
-    [ "dir"] = shell.dir(),
-    [ "build"] = "2016.7.29.2.7",
-    [ "buildURL"] = "http://pastebin.com/raw/d9u0SceS",
-    [ "directoryStructure" ] = {
-        [ "base" ] = "/iOS/router",
-    },
-    [ "modems" ] = {}
+_G.iOS = {
+    [ "dir" ] = shell.dir(),
+    [ "build" ] = "2017.04.04.03.21",
 }
+
+local modules = {
+	"log.lua",
+	"cache.lua",
+	"ilt.lua",
+	"update.lua",
+	"modem.lua",
+	"packet.lua",
+	"update.lua"
+}
+
+os.loadAPI(_G.iOS.dir .. "/../modules/module_manager.lua")
+_G["module_manager.lua"].load(modules)
 
 local cache = {}
 
 local continue = true
 
-function log(...)
-
-	if cache["log"] == nil then
-		cache["log"] = {}
-	end
-
-    local arguments = {...}
-
-    if arguments[1] == "ERR" or arguments[1] == "DEBUG" or arguments[1] == "INFO" then
-        if #arguments > 1 then
-
-            local pString = ""
-            local oldColor = term.getTextColor()
-
-            for k, v in pairs(arguments) do
-                if #pString == 0 then
-                    pString = "[" .. v .. "]"
-                else
-                    pString = pString .. " [" .. v .. "]"
-                end
-            end
-
-            table.insert(cache["log"], os.clock() .. " >> " .. pString)
-
-            if arguments[1] == "ERR" then
-
-                term.setTextColor(colors.red)
-                print(pString)
-
-            elseif arguments[1] == "DEBUG" then
-
-                term.setTextColor(colors.blue)
-                print(pString)
-
-            elseif arguments[1] == "INFO" then
-
-                term.setTextColor(colors.yellow)
-                print(pString)
-
-            end
-
-            term.setTextColor(oldColor)
-
-        else
-            local oldColor = term.getTextColor()
-            term.setTextColor(colors.red)
-            print("[ERR] Log must have more than one argument")
-            term.setTextColor(oldColor)
-        end
-    else
-        local oldColor = term.getTextColor()
-        term.setTextColor(colors.red)
-        print("[ERR] Invalid first argument")
-        term.setTextColor(oldColor)
-    end
-end
-
 function getLatestBuildNumber()
     if http.checkURL(_G.iOSr["buildURL"]) then
-        log("DEBUG", "checkURL true")
+        _G["log.lua"].log("DEBUG", "checkURL true")
         local headers = {
             [ "User-Agent" ] = "iOS/" .. _G.iOSr["build"] .. " (" .. os.version() .. ")"
         }
         local getVar = http.get(_G.iOSr["buildURL"], headers)
         local currentBuild = textutils.unserialize(getVar.readAll())["router"]
-        log("DEBUG", "Latest build: " .. currentBuild)
+        _G["log.lua"].log("DEBUG", "Latest build: " .. currentBuild)
         getVar.close()
         return currentBuild
     else
-        log("INFO", "checkURL false")
+        _G["log.lua"].log("INFO", "checkURL false")
         return 0
     end
 end
 
-function openModems()
-    local sides = rs.getSides()
-
-    if cache["vlans"] == nil then
-		cache["vlans"] = {}
-	end
-
-    for i=1, #sides do
-        if peripheral.getType(sides[i]) == "modem" then
-			local tmpWrap = peripheral.wrap(sides[i])
-            if tmpWrap.isWireless() == false then
-				_G.iOSr["modems"][sides[i]] = tmpWrap
-                _G.iOSr["modems"][sides[i]].closeAll()
-
-                if cache["vlans"][sides[i]] == nil then
-
-                    local vtbl = {1}
-
-                    cache["vlans"][sides[i]] = vtbl
-
-                    log("INFO", "Opening " .. sides[i] .. " on VLAN 1")
-
-                    _G.iOSr["modems"][sides[i]].open(1)
-
-                else
-
-                    for vl=1, #cache["vlans"][sides[i]] do
-
-                        log("INFO", "Opening " .. sides[i] .. " on VLAN " .. cache["vlans"][sides[i]][vl])
-
-                        _G.iOSr["modems"][sides[i]].open(cache["vlans"][sides[i]][vl])
-                    end
-
-                end
-			else
-				log("ERR", "Wireless modem found on " .. sides[i])
-            end
-        end
-    end
-
-end
-
 function checkOSStructure()
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"]) == false then
-        log("ERR", "Base directory does not exist")
-        log("ERR", "If this is your first time running this, then it is expected.")
-        fs.makeDir(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"])
-        log("DEBUG", "Created base directory")
+	local base = _G.iOS.dir .. "/iOS/"
+    if fs.exists(base) == false then
+        fs.makeDir(base)
+        ilog("ERR", "Base directory does not exist")
+        ilog("ERR", "If this is your first time running this, then it is expected.")
+        ilog("DEBUG", "Created base directory")
     end
-    if fs.exists(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/cache") == false then
-        log("ERR", "Cache file does not exist")
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/cache", "w")
-        t.write("{}")
-		cache["log"] = {}
-		cache["ilt"] = {}
-		cache["vlans"] = {}
-        t.close()
-	else
-	
-        local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/cache", "r")
-        cache = textutils.unserialize(t.readAll())
-		t.close()
-	
+
+    if _G["cache.lua"].read(base .. "/log") == nil then
+        _G["cache.lua"].write(base .. "/log", "{}")
+        ilog("ERR", "Log file does not exist")
+    end
+
+    if _G["cache.lua"].read(base .. "/vlan") == nil then
+        _G["cache.lua"].write(base .. "/vlan", "{}")
+        ilog("ERR", "Vlan file does not exist")
+    end
+
+    if _G["cache.lua"].read(base .. "/ilt") == nil then
+        _G["cache.lua"].write(base .. "/ilt", "{}")
+        ilog("ERR", "ILT file does not exist")
     end
 end
 
 function startup()
-    log("DEBUG", "Checking OS Folder Structure")
+    _G["log.lua"].log("DEBUG", "running", "checkOSStructure()")
     checkOSStructure()
-    log("INFO", "Done")
-    log("DEBUG", "Opening modems")
+    _G["log.lua"].log("DEBUG", "")
+    _G["log.lua"].log("DEBUG", "Opening modems")
     openModems()
-    log("DEBUG", "Checking for updates..")
-    log("DEBUG", "Current build: " .. _G.iOSr["build"])
+    _G["log.lua"].log("DEBUG", "Checking for updates..")
+    _G["log.lua"].log("DEBUG", "Current build: " .. _G.iOSr["build"])
     local latest = getLatestBuildNumber()
     if (_G.iOSr["build"] == latest) then
-        log("DEBUG", "You are on the latest software release")
+        _G["log.lua"].log("DEBUG", "You are on the latest software release")
     else
         if (_G.iOSr["build"] < latest) then
-            log("ERR", "You are running an out-of-date build")
+            _G["log.lua"].log("ERR", "You are running an out-of-date build")
         else
-            log("INFO", "You are on the development branch")
+            _G["log.lua"].log("INFO", "You are on the development branch")
         end
     end
-    log("INFO", "Done")
+    _G["log.lua"].log("INFO", "Done")
     print(
         [[
 ===================================================
@@ -205,21 +115,21 @@ local commands = {
 
         ["networking"] = function(arg)
             if string.lower(arg[1]) == "restart" then
-                log("INFO", "Restarting network")
+                _G["log.lua"].log("INFO", "Restarting network")
                 openModems()
-                log("INFO", "Done")
+                _G["log.lua"].log("INFO", "Done")
             else
-                log("ERR", "Invalid argument")
+                _G["log.lua"].log("ERR", "Invalid argument")
             end
         end,
 		
 		["cache"] = function(arg)
             if string.lower(arg[1]) == "write" then
-                log("INFO", "Writing cache")
+                _G["log.lua"].log("INFO", "Writing cache")
                 writeCache()
-                log("INFO", "Done")
+                _G["log.lua"].log("INFO", "Done")
             else
-                log("ERR", "Usage cache <write>")
+                _G["log.lua"].log("ERR", "Usage cache <write>")
             end
         end,
 
@@ -250,14 +160,12 @@ Would you like to update? [Y/n] ]]
 
             if (arg[1] == "clear") then
 
-                local t = fs.open(_G.iOSr["dir"] .. _G.iOSr["directoryStructure"]["base"] .. "/log", "w")
-                t.write("{}")
-                t.close()
+                _G["log.lua"].clearLog()
 
-                log("INFO", "Log file cleared")
+                _G["log.lua"].log("INFO", "Log file cleared")
 
             else
-                log("ERR", "Usage: log <clear>")
+                _G["log.lua"].log("ERR", "Usage: log <clear>")
             end
 
         end,
@@ -265,7 +173,7 @@ Would you like to update? [Y/n] ]]
         ["vlan"] = function(arg)
 
             if arg[1] == nil or arg[2] == nil or arg[3] == nil then
-                log("ERR", "Usage: vlan add  <side> <vlan #>")
+                _G["log.lua"].log("ERR", "Usage: vlan add  <side> <vlan #>")
                 return
             end
 
@@ -273,7 +181,7 @@ Would you like to update? [Y/n] ]]
                 if #arg == 3 then
 
                     if not tonumber(arg[3]) then
-                        log("ERR", "Usage: vlan add  <side> <vlan #>")
+                        _G["log.lua"].log("ERR", "Usage: vlan add  <side> <vlan #>")
                         return
                     end
 
@@ -304,7 +212,7 @@ Would you like to update? [Y/n] ]]
 
                                     if alreadyInVlanTable then
 
-                                        log("ERR", arg[2] .. " already contains VLAN " .. arg[3])
+                                        _G["log.lua"].log("ERR", arg[2] .. " already contains VLAN " .. arg[3])
                                         return
 
                                     else
@@ -314,26 +222,26 @@ Would you like to update? [Y/n] ]]
                                 end
 
 
-                                log("INFO", "Added VLAN " .. arg[2] .. " to side " .. arg[3])
+                                _G["log.lua"].log("INFO", "Added VLAN " .. arg[2] .. " to side " .. arg[3])
 
                             end
                         end
 
                         if (isValidSide == false) then
-                            log("ERR", "Invalid side <bottom|top|back|front|right|left>")
+                            _G["log.lua"].log("ERR", "Invalid side <bottom|top|back|front|right|left>")
                         end
 
                     else
 
-                        log("ERR", "VLAN must be between 1-128")
+                        _G["log.lua"].log("ERR", "VLAN must be between 1-128")
 
                     end
 
                 else
-                    log("ERR", "Usage: vlan add  <side> <vlan #>")
+                    _G["log.lua"].log("ERR", "Usage: vlan add  <side> <vlan #>")
                 end
             else
-                log("ERR", "Invalid argument")
+                _G["log.lua"].log("ERR", "Invalid argument")
             end
 
         end
