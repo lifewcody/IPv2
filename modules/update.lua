@@ -1,5 +1,5 @@
 local cVersion, pVersion, pType
-local pastebinURL = "http://pastebin.com/raw/d9u0SceS"
+local pastebinURL = "https://pastebin.com/raw/d9u0SceS"
 
 function setVersion(v)
 	cVersion = v
