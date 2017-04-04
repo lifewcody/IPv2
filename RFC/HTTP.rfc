@@ -1,0 +1,16 @@
+##############################
+#  InZernet Protocol HTTP    #
+##############################
+
+325.1 {Definitions}
+	
+325.2 {Headers}
+	325.2.1	{Request Headers}
+		[Request]
+		[Host]
+		[User-Agent]
+	325.2.2 {Returning Headers}
+		[Status]
+		[Date]
+		[Server]
+		[DATA]
