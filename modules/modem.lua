@@ -1,3 +1,14 @@
+function dependencies()
+	return {
+		["cache"] = "cache.lua",
+		["log"] = "log.lua"
+	}
+end
+
+function name()
+	return "modem"
+end
+
 local function generatePassword(length)
 	local code
 	local validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -14,7 +25,7 @@ end
 
 function openModems()
 
-	_G["modems"] = _G["cache.lua"].readCache("modems")
+	_G["modems"] = _G.modules.cache.readCache("modems")
 	
 	if _G["modems"] == nil then
 		_G["modems"] = {}
@@ -37,11 +48,11 @@ function openModems()
 						["password"] = generatePassword(6)
 					}
 				end
-				_G["log.lua"].log("NOTICE", string.upper(rs.getSides()[a]) .. " WiFi Information")
+				_G.modules.log.log("NOTICE", string.upper(rs.getSides()[a]) .. " WiFi Information")
 				for k,v in pairs(_G["modems"][rs.getSides()[a]]["WiFi"]) do
-					_G["log.lua"].log("INFO", k .. " > " .. v)
+					_G.modules.log.log("INFO", k .. " > " .. v)
 				end
-				_G["log.lua"].log("DEBUG", "---------------------------------------------------")
+				_G.modules.log.log("DEBUG", "---------------------------------------------------")
 				peripheral.call(rs.getSides()[a], "open", _G["modems"][rs.getSides()[a]]["WiFi"]["channel"])
 			else
 				if _G["modems"][rs.getSides()[a]]["VLAN"] == nil then
@@ -51,14 +62,14 @@ function openModems()
 				end
 				for k,v in pairs(_G["modems"][rs.getSides()[a]]["VLAN"]) do
 					peripheral.call(rs.getSides()[a], "open", _G["modems"][rs.getSides()[a]]["VLAN"][v])
-					_G["log.lua"].log("DEBUG", "Opening VLAN " .. v .. " on " .. rs.getSides()[a])
+					_G.modules.log.log("DEBUG", "Opening VLAN " .. v .. " on " .. rs.getSides()[a])
 				end
 			end
 		end
 	
 	end
 	
-	_G["cache.lua"].writeCache("modems", _G["modems"])
+	_G.modules.cache.writeCache("modems", _G["modems"])
 	
 end
 

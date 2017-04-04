@@ -1,3 +1,11 @@
+function dependencies()
+	return false
+end
+
+function name()
+	return "packet"
+end
+
 local packet_info = {
     [1] = {
         ["format"] = {

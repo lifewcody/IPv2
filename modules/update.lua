@@ -1,3 +1,11 @@
+function dependencies()
+	return false
+end
+
+function name()
+	return "update"
+end
+
 local cVersion, pVersion, pType
 local pastebinURL = "https://pastebin.com/raw/d9u0SceS"
 

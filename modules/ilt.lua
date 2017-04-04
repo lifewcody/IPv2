@@ -1,3 +1,13 @@
+function dependencies()
+	return {
+		["cache"] = "cache.lua"
+	}
+end
+
+function name()
+	return "ilt"
+end
+
 local function checkILT()
     if not _G.ilt then
 		local n = _G["cache.lua"].readCache("ilt")

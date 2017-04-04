@@ -1,3 +1,11 @@
+function dependencies()
+	return false
+end
+
+function name()
+	return "cache"
+end
+
 local function check()
     if _G.icache == nil then
         _G.icache = {}

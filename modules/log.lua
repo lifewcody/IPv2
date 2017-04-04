@@ -1,3 +1,13 @@
+function dependencies()
+	return {
+		["cache"] = "cache.lua"
+	}
+end
+
+function name()
+	return "log"
+end
+
 local logLevel = 0
 
 local logEvents = {
@@ -72,7 +82,7 @@ function log(...)
 	local args = {...}
 
 	if not _G.ilog then
-		local n = _G["cache.lua"].readCache("log")
+		local n = _G.modules.cache.readCache("log")
 		if n then
 			_G.ilog = textutils.unserialize(n)
 		else
@@ -98,12 +108,12 @@ function log(...)
 		return false
 	end
 
-	_G["cache.lua"].writeCache("log", textutils.serialize(_G.ilog))
+	_G.modules.cache.writeCache("log", textutils.serialize(_G.ilog))
 end
 
 function clearLog()
 	_G.ilog = {}
-	_G["cache.lua"].write("log", "{}")
+	__G.modules.cache.write("log", "{}")
 end
 
 function setLogLevel(level)
