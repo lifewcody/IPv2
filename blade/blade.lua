@@ -65,7 +65,6 @@ end
 
 function input()
     while true do
-
     end
 end
 
