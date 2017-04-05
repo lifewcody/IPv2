@@ -75,13 +75,9 @@ function getModuleInformation()
 end
 
 function load()
-    -- Build our module object
-    local moduleObject = {}
-    moduleObject.icache = {}
-    moduleObject.ucache = {}
-
-    -- Write our module object to the global table
-    _G.modules.cache = moduleObject
+    -- Set icache and ucache
+    _G.modules.cache.icache = {}
+    _G.modules.cache.ucache = {}
 end
 
 function unload()
