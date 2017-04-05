@@ -5,7 +5,9 @@
 local moduleInformation = {
 	name = "ilt",
 	version = "1.0.0",
-	dependencies = {"cache"}
+	dependencies = {
+		["cache"] = "cache.lua"
+	}
 }
 
 -- ILT FUNCTIONS
