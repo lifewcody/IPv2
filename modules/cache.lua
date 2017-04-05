@@ -41,7 +41,7 @@ local function loadCache(path)
 end
 
 -- CACHE FUNCTIONS
-function _G.modules.cache.saveCache()
+function saveCache()
     -- Loop through every file stored in the cache
     for k, _ in pairs(_G.modules.cache.icache) do
         -- If the file has been modified since last sync, save it
@@ -51,7 +51,7 @@ function _G.modules.cache.saveCache()
     end
 end
 
-function _G.modules.cache.writeCache(path, data)
+function writeCache(path, data)
     -- Write the data to the cache table
     _G.modules.cache.icache[path] = data
 
@@ -59,7 +59,7 @@ function _G.modules.cache.writeCache(path, data)
     _G.modules.cache.ucache[path] = true
 end
 
-function _G.modules.cache.readCache(path)
+function readCache(path)
     -- If we don't have the file loaded into the cache already, the load it from the disk
     if _G.modules.cache.icache[path] == nil then
         loadCache(path)
@@ -86,5 +86,5 @@ end
 
 function unload()
     -- Make sure all our files are saved
-    _G.modules.cache.saveCache()
+    saveCache()
 end
