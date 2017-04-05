@@ -5,7 +5,9 @@
 local moduleInformation = {
 	name = "log",
 	version = "1.0.0",
-	dependencies = {"cache"}
+	dependencies = {
+		["cache"] = "cache.lua"
+	}
 }
 
 -- LOCAL VARIABLES
