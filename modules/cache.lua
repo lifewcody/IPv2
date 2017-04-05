@@ -1,67 +1,90 @@
-function dependencies()
-	return false
-end
+-- Cache Module
+-- By Assossa
+-- Last Updated 2017.04.04.20.20
 
-function name()
-	return "cache"
-end
+local moduleInformation = {
+    name = "cache",
+    version = "1.0.0"
+}
 
-local function check()
-    if _G.icache == nil then
-        _G.icache = {}
-    end
-
-    if _G.ucache == nil then
-        _G.ucache = {}
-    end
-end
-
+-- LOCAL FUNCTIONS
 local function saveFile(path)
-    ipath = _G.workingDir .. path
+    -- Get the absolute path
+    local ipath = _G.iOS.dir .. path
 
-    if _G.icache[path] == nil then
-        return
-    end
+    -- If the file does not exist in the cache, then we don't need to save it
+    if _G.modules.cache.icache[path] == nil then return end
 
-    _G.ucache[path] = false
+    -- Save the file to the disk
     local file = fs.open(ipath, "w")
-    file.write(_G.icache[path])
+    file.write(_G.modules.cache.icache[path])
     file.close()
+
+    -- The file has not been modified since the last sync ^
+    _G.modules.cache.ucache[path] = false
 end
 
 local function loadCache(path)
-    ipath = _G.workingDir .. path
-    if fs.exists(ipath) then
-        _G.ucache[path] = false
-        local file = fs.open(ipath, "r")
-        _G.icache[path] = file.readAll()
-        file.close()
-    end
+    -- Get the absolute path
+    local ipath = _G.workingDir .. path
+
+    -- If the file does not exist on the disk, then we can't load it
+    if not fs.exists(ipath) then return end
+
+    -- Load the file from the disk
+    local file = fs.open(ipath, "r")
+    _G.modules.cache.icache[path] = file.readAll()
+    file.close()
+
+    -- The file has not been modified since the last sync ^
+    _G.modules.cache.ucache[path] = false
 end
 
-function setPath(path)
-    _G.workingDir = path
-end
-
-function saveCache()
-    for k,_ in pairs(_G.icache) do
-        if type(k) == "string" and _G.ucache[k] == true then
+-- CACHE FUNCTIONS
+function _G.modules.cache.saveCache()
+    -- Loop through every file stored in the cache
+    for k, _ in pairs(_G.modules.cache.icache) do
+        -- If the file has been modified since last sync, save it
+        if _G.modules.cache.ucache[k] then
             saveFile(k)
         end
     end
 end
 
-function writeCache(path, data)
-    _G.icache[path] = data
-    _G.ucache[path] = true
+function _G.modules.cache.writeCache(path, data)
+    -- Write the data to the cache table
+    _G.modules.cache.icache[path] = data
+
+    -- Set the file status to modified
+    _G.modules.cache.ucache[path] = true
 end
 
-function readCache(path)
-    check()
-
-    if _G.icache[path] == nil then
+function _G.modules.cache.readCache(path)
+    -- If we don't have the file loaded into the cache already, the load it from the disk
+    if _G.modules.cache.icache[path] == nil then
         loadCache(path)
     end
 
-    return _G.icache[path]
+    -- Return the file contents
+    return _G.modules.cache.icache[path]
+end
+
+-- REQUIRED MODULE FUNCTIONS
+function getModuleInformation()
+    return moduleInformation
+end
+
+function load()
+    -- Build our module object
+    local moduleObject = {}
+    moduleObject.icache = {}
+    moduleObject.ucache = {}
+
+    -- Write our module object to the global table
+    _G.modules.cache = moduleObject
+end
+
+function unload()
+    -- Make sure all our files are saved
+    _G.modules.cache.saveCache()
 end

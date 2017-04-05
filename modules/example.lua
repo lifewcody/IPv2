@@ -1,6 +1,6 @@
 -- Example Module
 -- By Assossa
--- Last Updated 4/4/17
+-- Last Updated 2017.04.04.19.41
 
 -- Required
 function getModuleInformation()
@@ -11,12 +11,12 @@ function getModuleInformation()
     }
 end
 
---Required
+-- Required
 function load()
     print("Module loaded!")
 end
 
---Required
+-- Required
 function unload()
     print("Module unloaded!")
 end
