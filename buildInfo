@@ -1,14 +1,6 @@
-local build = {
-
+{
 	["router"] = "2016.7.29.2.07",
 	["switch"] = "0.0.0.0.0",
 	["client"] = "0.0.0.0.0",
 	["server"] = "0.0.0.0.0",
-
 }
-
-local t = fs.open("/disk/build.info", "w")
-
-t.write(textutils.serialize(build))
-
-t.close()
