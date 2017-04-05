@@ -38,7 +38,11 @@ function load()
 
 	-- Load the ILT table from cache or create a blank table
 	local n = _G.modules.cache.readCache("ilt")
-	moduleObject.ilt = n == nil and {} or textutils.unserialize(n)
+	if n == nil then
+		moduleObject.ilt = {}
+	else
+		moduleObject = textutils.unserialize(n)
+	end
 
     -- Write our module object to the global table
     _G.modules.ilt = moduleObject
