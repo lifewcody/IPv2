@@ -1,13 +1,14 @@
-function dependencies()
-	return {
-		["cache"] = "cache.lua"
-	}
-end
+-- ILT Module
+-- By lifewcody
+-- Last Updated 2017.04.04.20.41
 
-function name()
-	return "ilt"
-end
+local moduleInformation = {
+	name = "ilt",
+	version = "1.0.0",
+	dependencies = {"cache"}
+}
 
+-- LOCAL FUNCTIONS
 local function checkILT()
     if not _G.ilt then
 		local n = _G["cache.lua"].readCache("ilt")
@@ -19,6 +20,7 @@ local function checkILT()
 	end
 end
 
+-- ILT FUNCTIONS
 function addToILT(IP, side)
     checkILT()
     _G.ilt[IP] = side
@@ -28,4 +30,17 @@ end
 function inILT(IP)
     checkILT()
     return IP == nil and nil or _G.ilt[IP]
+end
+
+-- REQUIRED MODULE FUNCTIONS
+function getModuleInformation()
+    return moduleInformation
+end
+
+function load()
+    
+end
+
+function unload()
+    
 end
