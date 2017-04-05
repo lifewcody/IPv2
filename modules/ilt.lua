@@ -1,5 +1,5 @@
 -- ILT Module
--- By lifewcody
+-- By Assossa
 -- Last Updated 2017.04.04.20.41
 
 local moduleInformation = {
@@ -8,28 +8,21 @@ local moduleInformation = {
 	dependencies = {"cache"}
 }
 
--- LOCAL FUNCTIONS
-local function checkILT()
-    if not _G.ilt then
-		local n = _G["cache.lua"].readCache("ilt")
-		if n then
-			_G.ilt = textutils.unserialize(n)
-		else
-			_G.ilt = {}
-		end
-	end
-end
-
 -- ILT FUNCTIONS
 function addToILT(IP, side)
-    checkILT()
-    _G.ilt[IP] = side
-    cache.write("ilt", textutils.serialize(_G.ilt))
+	-- Add IP to ILT table
+    _G.modules.ilt.ilt[IP] = side
+
+	-- Save to cache
+    cache.write("ilt", textutils.serialize(_G.modules.ilt.ilt))
+end
+
+function getILT(IP)
+    return IP == nil and nil or _G.modules.ilt.ilt[IP]
 end
 
 function inILT(IP)
-    checkILT()
-    return IP == nil and nil or _G.ilt[IP]
+	return getILT(IP) ~= nil
 end
 
 -- REQUIRED MODULE FUNCTIONS
@@ -38,7 +31,15 @@ function getModuleInformation()
 end
 
 function load()
-    
+    -- Build our module object
+    local moduleObject = {}
+
+	-- Load the ILT table from cache or create a blank table
+	local n = _G.modules.cache.readCache("ilt")
+	moduleObject.ilt = n == nil and {} or textutils.unserialize(n)
+
+    -- Write our module object to the global table
+    _G.modules.ilt = moduleObject
 end
 
 function unload()
