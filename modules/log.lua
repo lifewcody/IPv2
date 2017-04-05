@@ -1,13 +1,14 @@
-function dependencies()
-	return {
-		["cache"] = "cache.lua"
-	}
-end
+-- Log Module
+-- By lifewcody
+-- Last Updated 2017.04.04.21.23
 
-function name()
-	return "log"
-end
+local moduleInformation = {
+	name = "log",
+	version = "1.0.0",
+	dependencies = {"cache"}
+}
 
+-- LOCAL VARIABLES
 local logLevel = 0
 
 local logEvents = {
@@ -78,6 +79,7 @@ local logLevels = {
 
 }
 
+-- LOG FUNCTIONS
 function log(...)
 	local args = {...}
 
@@ -122,4 +124,17 @@ function setLogLevel(level)
 	else
 		return false
 	end
+end
+
+-- REQUIRED MODULE FUNCTIONS
+function getModuleInformation()
+    return moduleInformation
+end
+
+function load()
+    
+end
+
+function unload()
+    
 end

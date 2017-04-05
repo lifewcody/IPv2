@@ -1,14 +1,17 @@
-function dependencies()
-	return false
-end
+-- Update Module
+-- By lifewcody
+-- Last Updated 2017.04.04.21.30
 
-function name()
-	return "update"
-end
+local moduleInformation = {
+    name = "update",
+    version = "1.0.0"
+}
 
+-- LOCAL VARIABLES
 local cVersion, pVersion, pType
 local pastebinURL = "https://pastebin.com/raw/d9u0SceS"
 
+-- UPDATE FUNCTION
 function setVersion(v)
 	cVersion = v
 end
@@ -42,4 +45,17 @@ end
 
 function getLatestVersion()
 	return pVersion
+end
+
+-- REQUIRED MODULE FUNCTIONS
+function getModuleInformation()
+    return moduleInformation
+end
+
+function load()
+    
+end
+
+function unload()
+    
 end

@@ -1,14 +1,14 @@
-function dependencies()
-	return {
-		["cache"] = "cache.lua",
-		["log"] = "log.lua"
-	}
-end
+-- Modem Module
+-- By lifewcody
+-- Last Updated 2017.04.04.21.28
 
-function name()
-	return "modem"
-end
+local moduleInformation = {
+	name = "modem",
+	version = "1.0.0",
+	dependencies = {"cache", "log"}
+}
 
+-- LOCAL FUNCTIONS
 local function generatePassword(length)
 	local code
 	local validChars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -23,8 +23,8 @@ local function generatePassword(length)
 	return code
 end
 
+-- MODEM FUNCTIONS
 function openModems()
-
 	_G["modems"] = _G.modules.cache.readCache("modems")
 	
 	if _G["modems"] == nil then
@@ -75,6 +75,17 @@ end
 
 function modemLoop()
 
+end
 
+-- REQUIRED MODULE FUNCTIONS
+function getModuleInformation()
+    return moduleInformation
+end
 
+function load()
+    
+end
+
+function unload()
+    
 end

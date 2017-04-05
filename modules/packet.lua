@@ -1,11 +1,13 @@
-function dependencies()
-	return false
-end
+-- Packet Module
+-- By lifewcody
+-- Last Updated 2017.04.04.21.28
 
-function name()
-	return "packet"
-end
+local moduleInformation = {
+    name = "packet",
+    version = "1.0.0"
+}
 
+-- LOCAL VARIABLES
 local packet_info = {
     [1] = {
         ["format"] = {
@@ -37,7 +39,7 @@ local packet_info = {
     },
 }
 
--- Util Functions
+-- LOCAL FUNCTIONS
 local function getProtocolNum(version, protocol)
     if not protocol or protocol == "" then
         return 0
@@ -50,6 +52,7 @@ local function getProtocolNum(version, protocol)
     return 0
 end
 
+-- PACKET FUNCTIONS
 -- Packet Reading Functions
 function validatePacket(packet)
     return packet[1] ~= nil and packet_info[packet[1]] ~= nil
@@ -156,4 +159,17 @@ end
 function setUDPData(data, udpData)
     data[3] = udpData
     return data
+end
+
+-- REQUIRED MODULE FUNCTIONS
+function getModuleInformation()
+    return moduleInformation
+end
+
+function load()
+    
+end
+
+function unload()
+    
 end
