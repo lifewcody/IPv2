@@ -28,43 +28,46 @@ end
 
 -- MODEM FUNCTIONS
 function openModems()
-	_G["modems"] = _G.modules.cache.readCache("modems")
-	
-	if _G["modems"] == nil then
-		_G["modems"] = {}
+	print("here")
+	if not _G.modems then
+		local n = _G.modules.cache.readCache("modems")
+		if n then
+			_G.modems = n
+		else
+			_G.modems = {}
+		end
 	end
+	print(_G.modems)
 	
 	for a=1, #rs.getSides() do
 	
 		if peripheral.getType(rs.getSides()[a]) == "modem" then
-			if not _G["modems"][rs.getSides()[a]] then
-				_G["modems"][rs.getSides()[a]] = {
-					["TX"] = {},
-					["RX"] = {}
+			if _G.modems[rs.getSides()[a]] == nil then
+				_G.modems[rs.getSides()[a]] = {
+					["TX"] = 0,
+					["RX"] = 0,
 				}
 			end
 			if peripheral.call(rs.getSides()[a], "isWireless") then
-				if _G["modems"][rs.getSides()[a]]["WiFi"] == nil then
-					_G["modems"][rs.getSides()[a]]["WiFi"] = {
+				if _G.modems[rs.getSides()[a]]["WiFi"] == nil then
+					_G.modems[rs.getSides()[a]]["WiFi"] = {
 						["channel"] = math.random(150, 175),
 						["SSID"] = "CC" .. os.getComputerID() .. string.upper(string.sub(rs.getSides()[a],1,1)),
 						["password"] = generatePassword(6)
 					}
 				end
 				_G.modules.log.log("NOTICE", string.upper(rs.getSides()[a]) .. " WiFi Information")
-				for k,v in pairs(_G["modems"][rs.getSides()[a]]["WiFi"]) do
+				for k,v in pairs(_G.modems[rs.getSides()[a]]["WiFi"]) do
 					_G.modules.log.log("INFO", k .. " > " .. v)
 				end
 				_G.modules.log.log("DEBUG", "---------------------------------------------------")
-				peripheral.call(rs.getSides()[a], "open", _G["modems"][rs.getSides()[a]]["WiFi"]["channel"])
+				peripheral.call(rs.getSides()[a], "open", _G.modems[rs.getSides()[a]]["WiFi"]["channel"])
 			else
-				if _G["modems"][rs.getSides()[a]]["VLAN"] == nil then
-					_G["modems"][rs.getSides()[a]]["VLAN"] = {
-						1,
-					}
+				if _G.modems[rs.getSides()[a]]["VLAN"] == nil then
+					_G.modems[rs.getSides()[a]]["VLAN"] = {1}
 				end
-				for k,v in pairs(_G["modems"][rs.getSides()[a]]["VLAN"]) do
-					peripheral.call(rs.getSides()[a], "open", _G["modems"][rs.getSides()[a]]["VLAN"][v])
+				for k,v in pairs(_G.modems[rs.getSides()[a]]["VLAN"]) do
+					peripheral.call(rs.getSides()[a], "open", _G.modems[rs.getSides()[a]]["VLAN"][v])
 					_G.modules.log.log("DEBUG", "Opening VLAN " .. v .. " on " .. rs.getSides()[a])
 				end
 			end
@@ -72,12 +75,8 @@ function openModems()
 	
 	end
 	
-	_G.modules.cache.writeCache("modems", _G["modems"])
+	_G.modules.cache.writeCache("modems", _G.modems)
 	
-end
-
-function modemLoop()
-
 end
 
 -- REQUIRED MODULE FUNCTIONS
