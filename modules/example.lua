@@ -7,7 +7,9 @@ function getModuleInformation()
     return {
         name = "example",
         version = "1.0.0",
-        dependencies = {"module1", "module2"}
+        dependencies = {
+            ["dependency1"] = "someDependency.lua"
+        }
     }
 end
 
