@@ -72,7 +72,7 @@ function load()
     local files = fs.list(_G.iOS.dir .. "/../modules")
     for i=1,#files do
         local j = files[i]
-        if j ~= "module_manager.lua" then
+        if j ~= "module_manager.lua" and j ~= "example.lua" then
 			print("Attempting to load {" .. j .. "}")
             load_module(_G.iOS.dir .. "/../modules/" .. j)
         end
