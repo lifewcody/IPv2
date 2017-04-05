@@ -104,8 +104,10 @@ function log(...)
 				end
 			end
 			if isInLogLevels then
+				local before = term.getTextColor()
 				term.setTextColor(logEvents[string.upper(args[1])])
 				print(args[2])
+				term.setTextColor(before)
 			end
 		end
 	else
