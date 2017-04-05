@@ -5,7 +5,10 @@
 local moduleInformation = {
 	name = "modem",
 	version = "1.0.0",
-	dependencies = {"cache", "log"}
+	dependencies = {
+		["cache"] = "cache.lua",
+		["log"] = "log.lua"
+	}
 }
 
 -- LOCAL FUNCTIONS
