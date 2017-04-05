@@ -38,6 +38,9 @@ function load_module(_sPath)
 
 	-- Load module (from tAPI) to the correct name (from the function getModuleInformation())
 	_G.modules[tAPI.getModuleInformation().name] = tAPI
+
+	-- Run the load() function
+	tAPI.load()
 	
 
 	-- Make sure the dependencies is either false or not there (nil)
@@ -47,7 +50,7 @@ function load_module(_sPath)
 			-- If it is not loaded, attempt to load the module
 			if not isLoaded(k) == true then
 				print("Attempting to load dependency " .. k)
-				load_module(_G.iOS.dir .. "/../modules/" .. v)
+				load_module(_G.iOS.dir .. "/../../modules/" .. v)
 			else
 				print("Dependency already loaded : " .. k)
 			end
@@ -80,12 +83,12 @@ end
 
 -- For every module in /modules (except MM and the example) load it
 function load()
-    local files = fs.list(_G.iOS.dir .. "/../modules")
+    local files = fs.list(_G.iOS.dir .. "/../../modules")
     for i=1,#files do
         local j = files[i]
         if j ~= "module_manager.lua" and j ~= "example.lua" then
 			print("Attempting to load {" .. j .. "}")
-            load_module(_G.iOS.dir .. "/../modules/" .. j)
+            load_module(_G.iOS.dir .. "/../../modules/" .. j)
         end
     end
 end
