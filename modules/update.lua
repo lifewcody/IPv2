@@ -9,7 +9,7 @@ local moduleInformation = {
 
 -- LOCAL VARIABLES
 local cVersion, pVersion, pType
-local pastebinURL = "https://pastebin.com/raw/d9u0SceS"
+local buildURL = "https://raw.githubusercontent.com/InZernetTechnologies/IPv2/master/buildInfo"
 
 -- UPDATE FUNCTION
 function setVersion(v)
@@ -21,12 +21,12 @@ function setType(t)
 end
 
 function checkForUpdates()
-	if pastebinURL == nil or cVersion == nil or pType == nil then
+	if buildURL == nil or cVersion == nil or pType == nil then
 		return false
 	end
 
-	if http.checkURL(pastebinURL) then
-        local getVar = http.get(pastebinURL)
+	if http.checkURL(buildURL) then
+        local getVar = http.get(buildURL)
         pVersion = textutils.unserialize(getVar.readAll())[pType]
         getVar.close()
 		return true
