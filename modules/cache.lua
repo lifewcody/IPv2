@@ -9,14 +9,12 @@ local moduleInformation = {
 
 -- LOCAL FUNCTIONS
 local function saveFile(path)
-    -- Get the absolute path
-    local ipath = _G.iOS.dir .. path
 
     -- If the file does not exist in the cache, then we don't need to save it
     if _G.modules.cache.icache[path] == nil then return end
 
     -- Save the file to the disk
-    local file = fs.open(ipath, "w")
+    local file = fs.open(_G.iOS.dir .. path, "w")
     file.write(_G.modules.cache.icache[path])
     file.close()
 
@@ -25,14 +23,11 @@ local function saveFile(path)
 end
 
 local function loadCache(path)
-    -- Get the absolute path
-    local ipath = _G.workingDir .. path
-
     -- If the file does not exist on the disk, then we can't load it
-    if not fs.exists(ipath) then return end
+    if not fs.exists(_G.iOS.dir .. path) then return end
 
     -- Load the file from the disk
-    local file = fs.open(ipath, "r")
+    local file = fs.open(_G.iOS.dir .. path, "r")
     _G.modules.cache.icache[path] = file.readAll()
     file.close()
 
