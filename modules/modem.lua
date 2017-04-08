@@ -28,7 +28,6 @@ end
 
 -- MODEM FUNCTIONS
 function openModems()
-	print("here")
 	if not _G.modems then
 		local n = _G.modules.cache.readCache("modems")
 		if n then
@@ -37,7 +36,6 @@ function openModems()
 			_G.modems = {}
 		end
 	end
-	print(_G.modems)
 	
 	for a=1, #rs.getSides() do
 	
