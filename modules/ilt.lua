@@ -13,14 +13,20 @@ local moduleInformation = {
 -- ILT FUNCTIONS
 function addToILT(IP, side)
 	-- Add IP to ILT table
-    _G.modules.ilt.ilt[IP] = side
+    ilt = textutils.unserialize(_G.modules.cache.readCache("ilt"))
 
-	-- Save to cache
-    cache.write("ilt", textutils.serialize(_G.modules.ilt.ilt))
+	ilt[IP] = side
+
+	for k, v in pairs(ilt) do
+		print(k .. " > " .. v)
+	end
+
+    _G.modules.cache.writeCache("ilt", ilt)
 end
 
 function getILT(IP)
-    return IP == nil and nil or _G.modules.ilt.ilt[IP]
+	local ilt = _G.modules.cache.readCache("ilt")
+    return IP == nil and nil or ilt[IP]
 end
 
 function inILT(IP)
@@ -33,19 +39,13 @@ function getModuleInformation()
 end
 
 function load()
-    -- Build our module object
-    local moduleObject = {}
-
 	-- Load the ILT table from cache or create a blank table
 	local n = _G.modules.cache.readCache("ilt")
 	if n == nil then
-		moduleObject.ilt = {}
+		_G.modules.cache.writeCache("ilt", textutils.unserialize("{}"))
 	else
 		moduleObject = textutils.unserialize(n)
 	end
-
-    -- Write our module object to the global table
-    _G.modules.ilt = moduleObject
 end
 
 function unload()
