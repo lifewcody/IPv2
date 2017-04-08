@@ -1,13 +1,12 @@
 local i = 0
 while true do
-  local x = peripheral.wrap("left")
+  local x = peripheral.wrap("back")
   
   local dataPkt = {
     [ "yeet" ] = "yolo",
   }
   
-  local tmpPkt = {
-  
+  local tmpPkt = {  
     2,
     17,
     255,
@@ -18,7 +17,7 @@ while true do
   
   }
   
-  x.transmit(3, 1, tmpPkt)
+  x.transmit(1, 1, tmpPkt)
   i = i + 1
   sleep(3)
 end
