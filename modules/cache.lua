@@ -28,7 +28,7 @@ local function loadCache(path)
 
     -- Load the file from the disk
     local file = fs.open(_G.iOS.dir .. path, "r")
-    _G.modules.cache.icache[path] = file.readAll()
+    _G.modules.cache.icache[path] = textutils.serialize(file.readAll())
     file.close()
 
     -- The file has not been modified since the last sync ^
@@ -44,6 +44,7 @@ function saveCache()
             saveFile(k)
         end
     end
+    _G.modules.log.log("DEBUG", "Saved cache to disk")
 end
 
 function writeCache(path, data)
