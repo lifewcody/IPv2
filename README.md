@@ -39,4 +39,9 @@ Official Forum: http://www.computercraft.info/forums2/index.php?/topic/27268-ipv
 	/buildInfo - Used for the update-check
 
 # Build Number
- |(INCLUDES leading 0's and EST Time)
+	<Year>.<Month>.<Date>.<24Hour>.<Minute>
+	For any version purposes | Includes leading 0's and is in EST
+	
+# Wiki
+
+The Wiki provides documentation on modules and anything else, check there for anything that isn't covered.
