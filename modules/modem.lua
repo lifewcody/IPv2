@@ -2,6 +2,7 @@
 -- By lifewcody
 -- Last Updated 2017.04.04.21.28
 
+-- Module variables
 local moduleInformation = {
 	name = "modem",
 	version = "1.0.0",
@@ -10,6 +11,8 @@ local moduleInformation = {
 		["log"] = "log.lua"
 	}
 }
+
+local modems = {}
 
 -- LOCAL FUNCTIONS
 local function generatePassword(length)
@@ -26,55 +29,66 @@ local function generatePassword(length)
 	return code
 end
 
+local function getSSID(side)
+	return "CC" .. os.getComputerID() .. string.upper(string.sub(side,1,2))
+end
+
+local function getActiveSides()
+	local as = {} -- Create empty table
+	for s=1, #rs.getSides() do -- For each side on the computer: right, back, etc
+		if peripheral.getType(rs.getSides()[s]) == "modem" then -- If something is on that side and it is a modem
+			as[rs.getSides()[s]] = peripheral.call(rs.getSides()[s], "isWireless") -- Set the table key to the side and set it to if it's wireless (true = wireless, false = modem)
+			modems[rs.getSides()[s]] = {
+				[ "TX" ] = 0,
+				[ "RX" ] = 0
+			}
+		end
+	end
+	return as -- Return the table, empty or has entries
+end
+
+local function saveConfig()
+	_G.modules.cache.writeCache("modem", textutils.serialize(modems))
+	_G.modules.cache.saveCache()
+end
+
+function openWiFi(side)
+	print(modems.top.WiFi)
+	if modems[side]["WiFi"] == nil then
+		local WiFiInfo = { -- Create our Wifi table
+			[ "channel" ] = math.random(150, 175), -- Open a random channel on 150 to 175
+			[ "SSID" ] = getSSID(side), -- Generated the SSID. If it's on the top and CC ID is 1 then SSID is CC1TO
+			[ "password" ] = generatePassword(6) -- Generates a 6 digit password
+		}
+		modems[side]["WiFi"] = WiFiInfo
+	end
+	_G.modules.log.log("INFO", "WiFi on " .. side)
+	peripheral.call(side, "open", modems[side]["WiFi"]["channel"])
+	for k, v in pairs(modems[side]["WiFi"]) do
+		_G.modules.log.log("NOTICE", tostring(k) .. " >> " .. tostring(v))
+	end
+	return modems[side]["WiFi"]
+end
+
+local function open()
+	-- Actually opens the modems and ports on the specific channel as before, etc.
+end
+
 -- MODEM FUNCTIONS
 function openModems()
-	if not _G.modems then
-		local n = _G.modules.cache.readCache("modems")
-		if n then
-			_G.modems = n
+	print(modems.top.WiFi)
+	for k, v in pairs(modems.top.WiFi) do
+		print(k .. " > " .. tostring(v))
+	end
+	local activeSides = getActiveSides()
+	for side, isWireless in pairs(activeSides) do
+		if isWireless then
+			openWiFi(side)
 		else
-			_G.modems = {}
+
 		end
 	end
-	
-	for a=1, #rs.getSides() do
-	
-		if peripheral.getType(rs.getSides()[a]) == "modem" then
-			if _G.modems[rs.getSides()[a]] == nil then
-				_G.modems[rs.getSides()[a]] = {
-					["TX"] = 0,
-					["RX"] = 0,
-				}
-			end
-			if peripheral.call(rs.getSides()[a], "isWireless") then
-				if _G.modems[rs.getSides()[a]]["WiFi"] == nil then
-					_G.modems[rs.getSides()[a]]["WiFi"] = {
-						["channel"] = math.random(150, 175),
-						["SSID"] = "CC" .. os.getComputerID() .. string.upper(string.sub(rs.getSides()[a],1,1)),
-						["password"] = generatePassword(6)
-					}
-				end
-				_G.modules.log.log("NOTICE", string.upper(rs.getSides()[a]) .. " WiFi Information")
-				for k,v in pairs(_G.modems[rs.getSides()[a]]["WiFi"]) do
-					_G.modules.log.log("INFO", k .. " > " .. v)
-				end
-				_G.modules.log.log("DEBUG", "---------------------------------------------------")
-				peripheral.call(rs.getSides()[a], "open", _G.modems[rs.getSides()[a]]["WiFi"]["channel"])
-			else
-				if _G.modems[rs.getSides()[a]]["VLAN"] == nil then
-					_G.modems[rs.getSides()[a]]["VLAN"] = {1}
-				end
-				for k,v in pairs(_G.modems[rs.getSides()[a]]["VLAN"]) do
-					peripheral.call(rs.getSides()[a], "open", _G.modems[rs.getSides()[a]]["VLAN"][v])
-					_G.modules.log.log("DEBUG", "Opening VLAN " .. v .. " on " .. rs.getSides()[a])
-				end
-			end
-		end
-	
-	end
-	
-	_G.modules.cache.writeCache("modems", _G.modems)
-	
+	saveConfig()
 end
 
 -- REQUIRED MODULE FUNCTIONS
@@ -83,7 +97,12 @@ function getModuleInformation()
 end
 
 function load()
-    
+	local n = _G.modules.cache.readCache("modem")
+	if n == nil then
+		_G.modules.cache.writeCache("modem", modems)
+	else
+		modems = textutils.unserialize(n)
+	end
 end
 
 function unload()
