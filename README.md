@@ -5,29 +5,38 @@ Official Forum: http://www.computercraft.info/forums2/index.php?/topic/27268-ipv
 
 # Structure
 
+	/blade/ - Blade web browser
+		blade.lua - Blade web browser
+
 	/core_router/ - Everything related to the core router goes here
-
-		cr - Core router file
-		CoreRouter.lua - Core reouter test file
-
-	/modules/ - Modules for iOS
+		core_router.lua - Core router dev file
 	
+	/installer/ - Installer files
+		installer.lua - The installer program
+		programs.ccon - List of applications
+	
+	/modules/ - Modules for iOS
 		cache.lua - Cache module
+		example.lua - Template module, never gets loaded
+		ilt.lua - InZernet Location Table module
 		log.lua - Log module
 		modem.lua - Modem module
-		module_list.ccon - Module list
 		module_manager.lua - Module Manager
+		packet.lua - Packet module
 		update.lua - Update module
 	
+	/RFC/ - Request For Comments
+		Anything in here is for a protocol, or how something should operate
+	
+	/switch/ - Switch files
+		switch.lua - Switch dev file
+	
 	/test/ - Testing files go here
-
-		testPacketSend - Wraps left modem and sends a packet every 3 seconds
-		cr.lua - Test functions for core_router
+		cr.lua - Test functions for core_router [OUT OF DATE]
+		modemTest.lua - Test the modem module [UP TO DATE]adasdasd
+		tst - Sends valid packets, to see if they get routed correctly [UP TO DATE]
 	
-	
-	/buildInfo - Generates the build info for the pastebin updater
+	/buildInfo - Used for the update-check
 
 # Build Number
-
-	<Year>.<Month>.<Date>.<24Hour>.<Minute>
-(INCLUDES leading 0's and EST Time)
+ |(INCLUDES leading 0's and EST Time)
