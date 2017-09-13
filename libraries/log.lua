@@ -5,6 +5,8 @@ local cache = require("IPv2/cache")
 local os = require("os")
 local component = require("component")
 local term = require("term")
+local computer = require("computer")
+local math = require("math")
 
 local gpu = component.gpu
 
@@ -80,6 +82,11 @@ local logLevels = {
 }
 
 function log.log(...)
+	local percentRamUsed = ((computer.totalMemory() - computer.freeMemory()) / computer.totalMemory()) * 100
+	if percentRamUsed >= 85 then
+		print("DUMPING LOG FILE")
+		logFile = {}
+	end
     local arguments = {...}
 
     if #arguments >= 2 then
@@ -117,6 +124,10 @@ end
 
 function log.init()
     logFile = cache.get("log")
+end
+
+function log.setLevel(level)
+	logLevel = level
 end
 
 return log
