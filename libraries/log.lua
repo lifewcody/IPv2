@@ -81,37 +81,68 @@ local logLevels = {
 
 }
 
-function log.log(...)
-	local percentRamUsed = ((computer.totalMemory() - computer.freeMemory()) / computer.totalMemory()) * 100
-	if percentRamUsed >= 85 then
+local function tail(list)
+	return { select(2, table.unpack(list)) }
+end
+
+function log.ramUsage()
+	return ((computer.totalMemory() - computer.freeMemory()) / computer.totalMemory()) * 100
+end
+
+function log.checkRamUsage()
+	if log.ramUsage() >= 85 then
 		print("DUMPING LOG FILE")
 		logFile = {}
 	end
-    local arguments = {...}
+end
 
-    if #arguments >= 2 then
-        local sev = string.upper(arguments[1])
-		arguments[1] = nil
-        local lString = "[" .. sev .. "] "
-        for k, v in pairs(arguments) do
-            lString = lString .. "[" .. v .. "] "
-        end
-        table.insert(logFile, os.clock() .. " >> " .. lString)
-        if logEvents[sev] ~= nil then
-            local isInLogLevels = false
-            for i=1, #logLevels[logLevel] do
-                if logLevels[logLevel][i] == sev then
-                    isInLogLevels = true
-                end
-            end
-            if isInLogLevels then
-				gpu.setForeground(logEvents[sev])
-                print(lString)
-            end
-        end
-    else
-        return false
-    end
+function log.getSeverity(arguments)
+	return string.upper(arguments[1])
+end
+
+function log.buildMessage(arguments)
+	local sev = log.getSeverity(arguments)
+	local message = os.clock() .. " >> " .. "[" .. sev .. "] "
+	for k, v in pairs(tail(arguments)) do
+		message = message .. "[" .. v .. "] "
+	end
+	return message
+end
+
+function log.logMessage(message)
+	table.insert(logFile, message)
+end
+
+function log.isInLogLevels(sev)
+	for i=1, #logLevels[logLevel] do
+		if logLevels[logLevel][i] == sev then
+			return true
+		end
+	end
+	return false
+end
+
+function log.printMessage(message)
+	gpu.setForeground(logEvents[sev])
+	print(message)
+end
+
+function checkAndPrintMessage(message, sev)
+	if logEvents[sev] ~= nil then
+		if log.isInLogLevels(sev) then
+			log.printMessage(message)
+		end
+	end
+end
+
+function log.log(...)
+	local arguments = {...}
+	if #arguments < 2 then return false end
+	
+	local message = log.buildMessage(arguments)
+	log.checkRamUsage()
+	log.logMessage(message)
+	log.checkAndPrintMessage(message, log.getSeverity(arguments))
 end
 
 function log.save()
